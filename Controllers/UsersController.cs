@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Api.Services;
+
 
 namespace Api.Controllers
 {
@@ -10,7 +12,6 @@ namespace Api.Controllers
     
         private readonly IUserService _userService;
 
-        // The constructor expects IUserService to be registered in DI.
         public UsersController(IUserService userService)
         {
             _userService = userService;
@@ -29,13 +30,6 @@ namespace Api.Controllers
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null) return NotFound();
             return Ok(user);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<UserReadDto>> CreateUser([FromBody] UserCreateDto userDto)
-        {
-            var user = await _userService.CreateUserAsync(userDto);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
 
         [HttpPatch("{id}")]

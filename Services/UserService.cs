@@ -1,9 +1,16 @@
 using Api.Data;
-using Api.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Api.Services
 {
+    public interface IUserService
+    {
+        Task<IEnumerable<UserReadDto>> GetAllUsersAsync();
+        Task<UserReadDto?> GetUserByIdAsync(int id);
+        Task<UserReadDto?> UpdateUserAsync(int id, UserUpdateDto userDto);
+        Task<bool> DeleteUserAsync(int id);
+    }
     public class UserService : IUserService
     {
         private readonly AppDbContext _context;
@@ -39,32 +46,11 @@ namespace Api.Services
             };
         }
 
-        public async Task<UserReadDto> CreateUserAsync(UserCreateDto userDto)
-        {
-            var user = new User
-            {
-                FirstName = userDto.FirstName,
-                LastName = userDto.LastName,
-                Email = userDto.Email,
-                Password = userDto.Password
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return new UserReadDto
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email
-            };
-        }
-
         public async Task<UserReadDto?> UpdateUserAsync(int id, UserUpdateDto userDto)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null) return null;
+
 
             user.FirstName = userDto.FirstName ?? user.FirstName;
             user.LastName = userDto.LastName ?? user.LastName;
